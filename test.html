@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mapper Javascipt Program</title>
+</head>
+<body>
+
+<h1>This is Mapper Javascript Program.</h1>
+<p>To View output open your console tab of inspect element.</p>
+
+<script>
+
+
+let inputArr  = [{
+    "first_name": "Bob",
+    "last_name": "Smith",
+    "unknown": "unknown",
+    "description": "Bob Smith short profile",
+    "do_not_process" : false,
+    "email": [{
+    "email_address": "bob@smith.com",
+    "primary_address": true
+    }]
+    },
+    {
+    "first_name": "Clare",
+    "last_name": "Smith",
+    "do_not_process" : false,
+    "email": [{
+    "email_address": "c@smith.com",
+    "primary_address": true
+    },
+    {
+    "email_address": "clare@smith.com",
+    "primary_address": true
+    }
+    ]
+    },
+    {
+    "first_name": "John",
+    "last_name": "Smith",
+    "do_not_process" : false,
+    "email": [{
+    "email_address": "jsmith@smith.com",
+    "opt_out": false,
+    "invalid_email": false,
+    "primary_address": true
+    },
+    {
+    "email_address": "jsmith@smith1.com",
+    "opt_out": false,
+    "invalid_email": true,
+    "primary_address": false
+    },
+    {
+    "email_address": "j@smith.com"
+    }
+    ],
+    "salutation": "Mr",
+    "description": "John Smith"
+    }
+];
+
+let mapperArr = {
+    "first_name": "firstName",
+    "last_name": "lastName",
+    "email": "emailAddress",
+    "salutation": "salutation",
+    "description": "summary"
+};
+
+
+function mappers(inputArr, mapperArr){
+
+    if ((Array.isArray(inputArr) && inputArr.length) && ( mapperArr && Object.keys(mapperArr).length > 0 && Object.getPrototypeOf(mapperArr) === Object.prototype) ) {
+        
+        let inputArrLength = inputArr.length;
+        let data = [];
+        for(let i = 0 ; i< inputArrLength; i++){
+
+            if(inputArr[i].hasOwnProperty("do_not_process") === true && inputArr[i]["do_not_process"] === true  ){
+                continue;
+            }
+
+            let resultObject = {};
+            for (var key in mapperArr) {
+                if (mapperArr.hasOwnProperty(key)) {
+                    
+                    //property matches and property hasn't value then bypassing otherwise parsing all the properties of input array
+                    if(inputArr[i].hasOwnProperty(key) === true && inputArr[i][key] !== ""  ){
+                        
+                        let emailAddress = "";
+                        //Email address validation and extractions. - START
+                        if(key == "email"){
+                            let emailObject = inputArr[i][key];
+                            let emailLength = emailObject.length;
+                            for(let emailCounter = 0; emailCounter < emailLength;emailCounter++ ){
+                                
+                                if((emailObject[emailCounter].hasOwnProperty("primary_address") === true && emailObject[emailCounter]["primary_address"] === true) && ( (emailObject[emailCounter].hasOwnProperty("invalid_email") === false) || (emailObject[emailCounter].hasOwnProperty("invalid_email") === true && emailObject[emailCounter]["invalid_email"] === false)) ){
+                                    emailAddress = emailAddress + "  " +  emailObject[emailCounter]["email_address"]; //If there are multiple primary and valid email address then concate.
+                                }
+                            }
+                        }
+                        //Email address validation and extractions. - END
+
+                        resultObject[mapperArr[key]] = (key == "email") ? emailAddress.trim() : inputArr[i][key]; // Final result set mapping.
+                    }
+
+                }
+            }
+
+            data.push(resultObject);
+        } 
+        
+        return data;
+    }
+
+    return "Either input array is empty or mapper object is empty."
+}
+
+
+let resultSet = mappers(inputArr, mapperArr);
+
+console.log("Results are as under.");
+console.table(resultSet);
+
+
+
+</script>
+
+</body>
+</html>
+
+
